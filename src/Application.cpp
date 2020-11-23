@@ -10,6 +10,7 @@
 #include <glm/mat4x4.hpp>
 
 #include "Camera.cpp"
+#include "VoxelModelLoader.cpp"
 //#include "input/InputManager.cpp"
 #include "shaders/Shader.cpp"
 
@@ -80,6 +81,10 @@ int main(void)
     /* Shaders */
     ShaderProgramSource source = ParseShader("res/shaders/RayMarching.shader");
     unsigned int shader = CreateShaderVF(source.vertexSource, source.fragmentSource);
+
+    /* Load voxel model */
+    //std::vector<vec3> mushroom = LoadVoxelModel("res/models/mushroom.ply");
+
    // std::cout << source.fragmentSource << std::endl;
     //int outputSize = screenWidth * screenHeight * 3;
     //unsigned char* output = new unsigned char[outputSize];

@@ -134,7 +134,8 @@ float GetLight(vec3 p)
     // Shadows
     float d = RayMarch(p + n * SURF_DIST * 2., l);
 
-    if (d < length(lightPos - p)) dif *= .1;
+    //if (d >= MAX_DIST) dif = 0.0;
+    if (d < length(lightPos - p)) dif *= .2;
 
     return dif;
 }

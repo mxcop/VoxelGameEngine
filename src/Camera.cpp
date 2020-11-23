@@ -49,7 +49,17 @@ class WorldCamera
 
 		vec3 Forward() {
 			vec3 rad = rotationRadians();
-			return vec3(sin(rad.y) * cos(rad.x), sin(rad.x), cos(rad.x) * cos(rad.y));
+
+			float pitch = rotation.x;
+			float yaw = rotation.y;
+			float roll = rotation.z;
+
+			float x = -cos(yaw) * sin(pitch) * sin(roll) - sin(yaw) * cos(roll);
+			float y = -sin(yaw) * sin(pitch) * sin(roll) + cos(yaw) * cos(roll);
+			float z = cos(pitch) * sin(roll);
+			
+			return vec3(x, y, z);
+			//return vec3(sin(rad.y) * cos(rad.x), sin(rad.x), cos(rad.x) * cos(rad.y));
 		}
 
 		vec3 GetPosition() 
