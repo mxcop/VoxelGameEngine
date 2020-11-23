@@ -83,9 +83,9 @@ int main(void)
     unsigned int shader = CreateShaderVF(source.vertexSource, source.fragmentSource);
 
     /* Load voxel model */
-    //std::vector<vec3> mushroom = LoadVoxelModel("res/models/mushroom.ply");
+    std::vector<vec3> mushroom = LoadVoxelModel("res/models/mushroom.ply");
 
-   // std::cout << source.fragmentSource << std::endl;
+    // std::cout << source.fragmentSource << std::endl;
     //int outputSize = screenWidth * screenHeight * 3;
     //unsigned char* output = new unsigned char[outputSize];
     ////int count = 0;
@@ -130,7 +130,7 @@ int main(void)
         
         /* Player input */
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            cam.position -= cam.Forward() / 10.0f;
+            cam.position -= vec3(0.0, 0.0, 0.1);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
             cam.position += vec3(0.0, 0.0, 0.1);
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
@@ -159,11 +159,11 @@ int main(void)
         float time = (float)glfwGetTime();
 
         glUniform1f(glGetUniformLocation(shader, "u_time"), time);
-        glUniform1i(glGetUniformLocation(shader, "u_voxelCount"), 2);
+        glUniform1i(glGetUniformLocation(shader, "u_voxelCount"), mushroom.size());
         glUniform2f(glGetUniformLocation(shader, "u_resolution"), screenWidth, screenHeight);
         glUniform3f(glGetUniformLocation(shader, "u_cameraPosition"), camPos->x, camPos->y, camPos->z);
         glUniformMatrix3fv(glGetUniformLocation(shader, "u_cameraOrientation"), 1, GL_FALSE, &cam.GetRotation()[0][0]);
-        glUniform3fv(glGetUniformLocation(shader, "u_voxels"), 3, glm::value_ptr(voxels[0]));
+        glUniform3fv(glGetUniformLocation(shader, "u_voxels"), mushroom.size(), glm::value_ptr(mushroom[0]));
 
         /* Draw a quad that covers the screen */
         glDrawArrays(GL_TRIANGLES, 0, 6);

@@ -18,7 +18,7 @@ uniform int u_voxelCount;
 uniform vec2 u_resolution;
 uniform vec3 u_cameraPosition;
 uniform mat3 u_cameraOrientation;
-uniform vec3 u_voxels[3];
+uniform vec3 u_voxels[160];
 
 out vec4 fragColor;
 
@@ -32,7 +32,7 @@ out vec4 fragColor;
 // Constants
 #define PI 3.1415925359
 #define TWO_PI 6.2831852
-#define MAX_STEPS 100 // Mar Raymarching steps
+#define MAX_STEPS 32 // Mar Raymarching steps
 #define MAX_DIST 100. // Max Raymarching distance
 #define SURF_DIST .01 // Surface Distance
 
@@ -48,7 +48,7 @@ float GetDist(vec3 a, vec3 b)
 float GetBoxDist(vec3 p, vec3 cp)
 {
     // vec3 b : bounds of the box;
-    vec3 b = vec3(1, 1, 1);
+    vec3 b = vec3(.1, .1, .1);
 
     // vec3 q : subtracts both positions and the bounds;
     vec3 q = abs(p - cp) - b;
@@ -70,11 +70,16 @@ float GetSceneDist(vec3 p)
 {
     // smallest distance.
     float d = GetDist(p, u_voxels[0]);
-    vec3 v = u_voxels[0];
+    vec3 v = u_voxels[0] * .1;
+    v += vec3(0.0, 1.0, 0.0);
 
-    for (int i = 1; i < 3; i++)
+    for (int i = 1; i < u_voxelCount; i++)
     {
-        vec3 voxel = u_voxels[i];
+        //if (u_voxels[i] == vec3(0., 0., 0.))
+        //    break;
+
+        vec3 voxel = u_voxels[i] * .1;
+        voxel += vec3(0.0, 1.0, 0.0);
 
         float vd = GetDist(p, voxel);
 
