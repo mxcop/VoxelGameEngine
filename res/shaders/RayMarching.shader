@@ -1,5 +1,5 @@
 #shader vertex
-#version 330 core
+#version 430 core
 
 layout(location = 0) in vec4 position;
 
@@ -10,7 +10,7 @@ void main()
 
 
 #shader fragment
-#version 330 core
+#version 430 core
 
 precision highp float;
 uniform float u_time;
@@ -18,7 +18,7 @@ uniform int u_voxelCount;
 uniform vec2 u_resolution;
 uniform vec3 u_cameraPosition;
 uniform mat3 u_cameraOrientation;
-uniform vec3 u_voxels[];
+uniform vec3 u_voxels[3];
 
 out vec4 fragColor;
 
@@ -59,9 +59,9 @@ float GetBoxDist(vec3 p, vec3 cp)
     //float planeDist = p.y;
 
     // get the minimum of these distances;
-    float d = /*min(*/boxDist/*, planeDist)*/;
+    //float d = min(boxDist, planeDist);
 
-    return d;
+    return boxDist;
 }
 
 /// vec3 p  : position to check against;
@@ -69,25 +69,27 @@ float GetBoxDist(vec3 p, vec3 cp)
 float GetSceneDist(vec3 p)
 {
     // smallest distance.
-    //float d = GetDist(p, u_voxels[0]);
-    //int v = 0;
+    float d = GetDist(p, u_voxels[0]);
+    vec3 v = u_voxels[0];
 
-    //for (int i = 0; i < u_voxelCount; i++)
-    //{
-    //    float vd = GetDist(p, u_voxels[i]);
+    for (int i = 1; i < 3; i++)
+    {
+        vec3 voxel = u_voxels[i];
 
-    //    if (vd < d) {
-    //        d = vd;
-    //        v = i;
-    //    }
+        float vd = GetDist(p, voxel);
 
-        //d = min(vd, d);
+        if (vd < d) {
+            d = vd;
+            v = voxel;
+        }
+    }
 
-        //if (vd == d)
-        //    v = i;
-    //}
+    return min(GetBoxDist(p, v), p.y);
 
-    return min(GetBoxDist(p, u_voxels[0]), p.y);
+    //for (int k = 0; k < 10; ++k)
+    //    if (u_voxelCount == k)
+    //        return min(GetBoxDist(p, u_voxels[k + 2]), p.y);
+    //return min(GetBoxDist(p, u_voxels[0]), p.y);
 }
 
 /// vec3 ro : ray origin;
@@ -119,10 +121,10 @@ vec3 GetNormal(vec3 p)
     return normalize(n);
 }
 
-float GetLight(vec3 p, vec3 lp)
+float GetLight(vec3 p)
 {
     // Directional light
-    vec3 lightPos = lp; // Light Position
+    vec3 lightPos = vec3(5. * sin(u_time), 5., 5.0 * cos(u_time)); // Light Position
     vec3 l = normalize(lightPos - p); // Light Vector
     vec3 n = GetNormal(p); // Normal Vector
 
@@ -166,7 +168,7 @@ void main()
         float d = RayMarch(ro, rd); // Distance ! PROBLEM !
         //float d = 255.;
         vec3 p = ro + rd * d;
-        float dif = GetLight(p, vec3(5. * sin(u_time), 5., 5.0 * cos(u_time))); // Diffuse lighting
+        float dif = GetLight(p); // Diffuse lighting
         //d *= .02;
         vec3 color = vec3(dif);
         //color += GetNormal(p);
@@ -179,4 +181,11 @@ void main()
     //else {
     //    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
     //}
+
+        /*if (u_voxelCount == 3) {
+            fragColor = vec4(0.0, 0.0, 1.0, 1.0);
+        }
+        else {
+            fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }*/
 }

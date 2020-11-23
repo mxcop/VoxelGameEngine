@@ -1,10 +1,2 @@
-﻿  Application.cpp
-D:\VSProjects\VoxelEngine\src\RayMarcher.cpp(7,29): warning C4305: 'initializing': truncation from 'double' to 'float'
-D:\VSProjects\VoxelEngine\src\RayMarcher.cpp(11,58): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-D:\VSProjects\VoxelEngine\src\Camera.cpp(142,53): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-D:\VSProjects\VoxelEngine\src\Camera.cpp(143,53): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-D:\VSProjects\VoxelEngine\src\Camera.cpp(144,53): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-D:\VSProjects\VoxelEngine\src\math\CMath.cpp(47,39): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-D:\VSProjects\VoxelEngine\src\math\CMath.cpp(48,39): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-D:\VSProjects\VoxelEngine\src\math\CMath.cpp(49,39): warning C4244: '=': conversion from 'float' to 'unsigned char', possible loss of data
-  VoxelEngine.vcxproj -> D:\VSProjects\VoxelEngine\bin\Win32\Debug\VoxelEngine.exe
+﻿  Camera.cpp
+  VoxelEngine.vcxproj -> D:\VSProjects\Repos\VoxelGameEngine\bin\Win32\Debug\VoxelEngine.exe

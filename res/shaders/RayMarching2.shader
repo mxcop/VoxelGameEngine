@@ -105,21 +105,21 @@ float GetLight(vec3 p)
 
 void main()
 {
-    //vec2 uv = (gl_FragCoord.xy - .5 * u_resolution.xy) / u_resolution.y;
+    vec2 uv = (gl_FragCoord.xy - .5 * u_resolution.xy) / u_resolution.y;
 
-    //vec3 ro = vec3(0, 2, 0); // Ray Origin/Camera
-    //vec3 rd = normalize(vec3(uv.xy, 1.)); // Ray Direction
+    vec3 ro = vec3(0, 2, 0); // Ray Origin/Camera
+    vec3 rd = normalize(vec3(uv.xy, 1.)); // Ray Direction
 
-    //float d = RayMarch(ro, rd); // Distance
+    float d = RayMarch(ro, rd); // Distance
 
-    //vec3 p = ro + rd * d;
-    //float dif = GetLight(p); // Diffuse lighting
-    //d *= .2;
-    //vec3 color = vec3(dif);
+    vec3 p = ro + rd * d;
+    float dif = GetLight(p); // Diffuse lighting
+    d *= .2;
+    vec3 color = vec3(dif);
     //color += GetNormal(p);
     //float color = GetLight(p);
     
     // Set the output color
-    float c = (sin(u_time * 45) + 1) / 2.0;
-    fragColor = vec4(c, c, c, 1.0);
+    //float c = (sin(u_time * 45) + 1) / 2.0;
+    fragColor = vec4(color, 1.0);
 }
