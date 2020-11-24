@@ -1,5 +1,5 @@
 #shader vertex
-#version 430 core
+#version 330 core
 
 layout(location = 0) in vec4 position;
 
@@ -10,7 +10,7 @@ void main()
 
 
 #shader fragment
-#version 430 core
+#version 330 core
 
 precision highp float;
 uniform float u_time;
@@ -19,6 +19,7 @@ uniform vec2 u_resolution;
 uniform vec3 u_cameraPosition;
 uniform mat3 u_cameraOrientation;
 uniform vec3 u_voxels[160];
+vec3 closestVoxel;
 
 out vec4 fragColor;
 
@@ -32,14 +33,26 @@ out vec4 fragColor;
 // Constants
 #define PI 3.1415925359
 #define TWO_PI 6.2831852
-#define MAX_STEPS 32 // Mar Raymarching steps
-#define MAX_DIST 100. // Max Raymarching distance
+#define MAX_STEPS 50 // Mar Raymarching steps
+#define MAX_DIST 50. // Max Raymarching distance
 #define SURF_DIST .01 // Surface Distance
 
 /// SUMMARY : gets the distance from a to b;
 float GetDist(vec3 a, vec3 b)
 {
-    return /*min(*/pow((a.x - b.x), 2.0) + pow((a.y - b.y), 2.0) + pow((a.z - b.z), 2.0)/*, a.y)*/;
+    float deltaX = a.x - b.x;
+    float deltaY = a.y - b.y;
+    float deltaZ = a.z - b.z;
+
+    return deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+
+    //return length(a - b);
+    //return abs((a.x - b.x) + (a.y - b.y) + (a.z - b.z));
+    //return abs(a.x - b.x) + abs(a.y - b.y) + abs(a.z - b.z);
+    //return (a.x - b.x) + (a.y - b.y) + (a.z - b.z);
+    //return pow((a.x - b.x), 2.0) + pow((a.y - b.y), 2.0) + pow((a.z - b.z), 2.0);
+    //return sqrt(pow((a.x - b.x), 2.0) + pow((a.y - b.y), 2.0) + pow((a.z - b.z), 2.0));
+    //return 1;
 }
 
 /// vec3 p  : position to check against;
@@ -65,15 +78,37 @@ float GetBoxDist(vec3 p, vec3 cp)
 }
 
 /// vec3 p  : position to check against;
+/// vec3 cp : center of the box;
+/// SUMMARY : gets the signed distance from p to the box and ground;
+float GetBoxDistL(vec3 p, vec3 cp)
+{
+    // vec3 b : bounds of the box;
+    vec3 b = vec3(.1, .1, .1);
+
+    // vec3 q : subtracts both positions and the bounds;
+    vec3 q = abs(p - cp) - b;
+
+    // get the signed distance for the box;
+    float boxDist = length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+    // get the signed distance for the ground plane;
+    //float planeDist = p.y;
+
+    // get the minimum of these distances;
+    float d = boxDist; // min(boxDist, planeDist);
+
+    return d;
+}
+
+/// vec3 p  : position to check against;
 /// SUMMARY : gets the signed distance from p to the scene;
 float GetSceneDist(vec3 p)
 {
     // smallest distance.
-    float d = GetDist(p, u_voxels[0]);
-    vec3 v = u_voxels[0] * .1;
-    v += vec3(0.0, 1.0, 0.0);
+    float d = 1.0 / 0.0;//GetDist(p, u_voxels[0]);
+    //closestVoxel = u_voxels[0] * .1;
+    //closestVoxel += vec3(0.0, 1.0, 0.0);
 
-    for (int i = 1; i < u_voxelCount; i++)
+    for (int i = 0; i < u_voxelCount; i++)
     {
         //if (u_voxels[i] == vec3(0., 0., 0.))
         //    break;
@@ -85,11 +120,11 @@ float GetSceneDist(vec3 p)
 
         if (vd < d) {
             d = vd;
-            v = voxel;
+            closestVoxel = voxel;
         }
     }
 
-    return min(GetBoxDist(p, v), p.y);
+    return /*min(*/GetBoxDist(p, closestVoxel)/*, p.y)*/;
 
     //for (int k = 0; k < 10; ++k)
     //    if (u_voxelCount == k)
@@ -108,7 +143,12 @@ float RayMarch(vec3 ro, vec3 rd)
         vec3 p = ro + rd * dO;
         float ds = GetSceneDist(p); // ds is Distance Scene ! PROBLEM !
         dO += ds;
-        if (dO > MAX_DIST || ds < SURF_DIST)
+        if (dO > MAX_DIST)
+        {
+            closestVoxel = vec3(0, 0, 0);
+            break;
+        }
+        if (ds < SURF_DIST)
             break;
     }
     return dO;
@@ -116,12 +156,12 @@ float RayMarch(vec3 ro, vec3 rd)
 
 vec3 GetNormal(vec3 p)
 {
-    float d = GetSceneDist(p); // Distance
+    float d = GetBoxDistL(p, closestVoxel); // Distance
     vec2 e = vec2(.01, 0); // Epsilon
     vec3 n = d - vec3(
-        GetSceneDist(p - e.xyy),
-        GetSceneDist(p - e.yxy),
-        GetSceneDist(p - e.yyx));
+        GetBoxDistL(p - e.xyy, closestVoxel),
+        GetBoxDistL(p - e.yxy, closestVoxel),
+        GetBoxDistL(p - e.yyx, closestVoxel));
 
     return normalize(n);
 }
@@ -171,12 +211,15 @@ void main()
         //vec4 mo = vec4(ro, 1.0) * vm;
         //vec4 md = vec4(rd, 1.0) * vm;
 
-        float d = RayMarch(ro, rd); // Distance ! PROBLEM !
+        float d = RayMarch(ro, rd); // Distance
+        vec3 color = vec3(0.0, 0.0, 0.0);
         //float d = 255.;
-        vec3 p = ro + rd * d;
-        float dif = GetLight(p); // Diffuse lighting
-        //d *= .02;
-        vec3 color = vec3(dif);
+        if (closestVoxel != vec3(0, 0, 0)) {
+            vec3 p = ro + rd * d;
+            float dif = GetLight(p); // Diffuse lighting
+            //d *= .02;
+            color = vec3(dif);
+        }
         //color += GetNormal(p);
         //float color = GetLight(p);
 

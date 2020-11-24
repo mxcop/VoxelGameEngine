@@ -84,7 +84,7 @@ int main(void)
 
     /* Load voxel model */
     std::vector<vec3> mushroom = LoadVoxelModel("res/models/mushroom.ply");
-
+    
     // std::cout << source.fragmentSource << std::endl;
     //int outputSize = screenWidth * screenHeight * 3;
     //unsigned char* output = new unsigned char[outputSize];
