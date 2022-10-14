@@ -1,5 +1,4 @@
-# VoxelGameEngine
+# Voxel Game Engine
 
-git add -A
-git commit -m "message"
-git push
+VGE was a project I worked on to learn about C++, OpenGL, and Raymarching.<br>
+<sup>This project is discontinued</sup>
